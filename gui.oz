@@ -74,9 +74,18 @@ define
 	 end
 	 {@grid configure(label(image:Img) row:X+X-1 column:Y+Y-1)}
       end
-      meth disposeFood()
+      %meth disposeFood()
 	 
-      end
+      %end
+      %meth disposeWood()
+
+      %end
+      %meth disposeStone()
+
+      %end
+      %meth disposeSteel()
+
+      %end
       meth changeFood(X)
 	 S P in
 	 S = @food
