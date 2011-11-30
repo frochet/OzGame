@@ -28,6 +28,11 @@ define
 	 proc {$ M} {Send P M} end
    end
 
+   fun {GetInt L Acc}
+      case L of nil then Acc
+      [] H|T then {GetInt T Acc*10 + H-48} 
+      end
+   end
    class Gui
       attr grid
 	 food steel wood stone
@@ -87,34 +92,63 @@ define
 
       %end
       meth changeFood(X)
-	 S P in
+	 S P T W in
 	 S = @food
 	 {S get(text:P)}
-	 {S set(""#P.1+X-48)} % propriete handle d'un label ?
+	 T = {GetInt P 0}
+	 W = T+X
+	 if W < 0 then W in
+	    W = 0
+	    {S set(""#W)}
+	 else
+	    {S set(""#W)}
+	 end
       end
       meth changeStone(X)
-	 S P in
+	 S P T W in
 	 S = @stone
-	 {S get(text:p)}
-	 {S set(""#P.1 + X - 48)} % propriete cell
+	 {S get(text:P)}
+	 T = {GetInt P 0}
+	 W = T+X
+	 if W < 0 then W in
+	    W = 0
+	    {S set(""#W)}
+	 else
+	    {S set(""#W)}
+	 end
       end
       meth changeSteel(X)
-	 S P in
+	 S P T W in
 	 S = @steel
 	 {S get(text:P)}
-	 {S set(""#P.1 + X -48)}
+	 T = {GetInt P 0}
+	 W = T+X
+	 if W < 0 then W in
+	    W = 0
+	    {S set(""#W)}
+	 else
+	    {S set(""#W)}
+	 end
       end
       meth changeWood(X)
-	 S P in
+	 S P T W in
 	 S = @wood
 	 {S get(text:P)}
-	 {S set(""#P.1 + X-48)}
+	 T = {GetInt P 0}
+	 W = T+X
+	 if W < 0 then W in
+	    W = 0
+	    {S set(""#W)}
+	 else
+	    {S set(""#W)}
+	 end
       end
    end
 
    %% create the GUI object
    G = {NewActive Gui init(Args.height Args.width)}
    %{G score(a 4)}
-   {G changeFood(4)}
-   {G changeFood(8)}
+  
+   {G changeStone(1)}
+   {G changeSteel(10)}
 end
