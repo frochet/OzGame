@@ -33,13 +33,41 @@ define
       [] H|T then {GetInt T Acc*10 + H-48} 
       end
    end
+   % X et Y des listes de coordonnées
+   proc {DrawImg X Y Img}
+      case [H]#[H2] of X#Y then
+	 {@grid configure(label(image:Img) row:H column:H2)}
+      [] H|T#H2|T2 then
+	 {@grid configure(label(image:Img) row:H column:H2)}
+	 {DrawImg T T2 Img}
+      []nil#nil then skip
+      end
+   end
    
    % procedure qui va demander de l'information à l'environnement et configurer le board au retour du message.
    proc{ConfigureGui Msg}
       case Msg of
-	 getfoodinfo(foodImg) then
-      []
-	 
+	 getfoodinfo(foodImg grid) then
+	 thread X Y in
+	    {Send ... getfoodinfo(X Y)}
+	    {DrawImg X Y foodImg}
+	 end
+      [] getsteelinfo(steelImg grid) then
+	  thread X Y in
+	    {Send ... getsteelinfo(X Y)}
+	    {DrawImg X Y steeldImg}
+	 end
+      [] getstoneinfo(stoneImg grid) then
+	  thread X Y in
+	    {Send ... getstoneinfo(X Y)}
+	    {DrawImg X Y stoneImg}
+	 end
+      [] getwoodinfo(woodImg grid) then
+	  thread X Y in
+	    {Send ... getwoodinfo(X Y)}
+	    {DrawImg X Y woodImg}
+	  end
+      end
    end
    class Gui
       attr grid
@@ -49,7 +77,7 @@ define
 	 CD = {OS.getCWD}
 	 Grid Food Steel Stone Wood
       in
-	 % Envoyer message a l'environement pour demander information sur le jeu
+		
 	 {{QTk.build td(
 		grid(handle:Grid bg:white)
 			lr(label(text:"Food :") label(text:"0" handle: Food)
@@ -78,6 +106,11 @@ define
 	 stone := Stone
 	 foodImg := {QTk.newImage photo(file:CD#'/food.gif')}
 	 bg := {QTk.newImage photo(file:CD#'/white.gif')}
+       % Envoyer message a l'environement pour demander information sur le jeu
+	 {ConfigureGui getfoodinfo(foodImg grid)}
+	 {ConfigureGui getsteelinfo(steelImg grid)}
+	 {ConfigureGui getstoneinfo(stoneImg grid)}
+	 {ConfigureGui getwoodinfo(woodImg grid)}
       end
 
       meth player(Team X Y) Img in
@@ -162,4 +195,8 @@ define
    {G changeSteel(10)}
    {Delay 1000}
    {G changeSteel(~24)}
-end
+   end
+
+
+
+   
