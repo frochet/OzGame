@@ -33,6 +33,14 @@ define
       [] H|T then {GetInt T Acc*10 + H-48} 
       end
    end
+   
+   % procedure qui va demander de l'information à l'environnement et configurer le board au retour du message.
+   proc{ConfigureGui Msg}
+      case Msg of
+	 getfoodinfo(foodImg) then
+      []
+	 
+   end
    class Gui
       attr grid
 	 food steel wood stone
@@ -41,6 +49,7 @@ define
 	 CD = {OS.getCWD}
 	 Grid Food Steel Stone Wood
       in
+	 % Envoyer message a l'environement pour demander information sur le jeu
 	 {{QTk.build td(
 		grid(handle:Grid bg:white)
 			lr(label(text:"Food :") label(text:"0" handle: Food)
@@ -151,4 +160,6 @@ define
   
    {G changeStone(1)}
    {G changeSteel(10)}
+   {Delay 1000}
+   {G changeSteel(~24)}
 end
