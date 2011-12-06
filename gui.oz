@@ -43,41 +43,17 @@ define
       []nil#nil then skip
       end
    end
-   
-   % procedure qui va demander de l'information à l'environnement et configurer le board au retour du message.
-   proc{ConfigureGui Msg}
-      case Msg of
-	 getfoodinfo(foodImg grid) then
-	 thread X Y in
-	    {Send ... getfoodinfo(X Y)}
-	    {DrawImg X Y foodImg}
-	 end
-      [] getsteelinfo(steelImg grid) then
-	  thread X Y in
-	    {Send ... getsteelinfo(X Y)}
-	    {DrawImg X Y steeldImg}
-	 end
-      [] getstoneinfo(stoneImg grid) then
-	  thread X Y in
-	    {Send ... getstoneinfo(X Y)}
-	    {DrawImg X Y stoneImg}
-	 end
-      [] getwoodinfo(woodImg grid) then
-	  thread X Y in
-	    {Send ... getwoodinfo(X Y)}
-	    {DrawImg X Y woodImg}
-	  end
-      end
+      
    end
    class Gui
       attr grid
 	 food steel wood stone
-	 foodImg steelImg woodImg stoneImg playerImg bg
+	 foodImg steelImg woodImg stoneImg playerImg homeImg bg 
       meth init(H W)
 	 CD = {OS.getCWD}
-	 Grid Food Steel Stone Wood
+	 Grid Food Steel Stone Wood H2 W2 StaticEnv
       in
-		
+	 {ConfigureGui gerboardsize(H2 W2)}
 	 {{QTk.build td(
 		grid(handle:Grid bg:white)
 			lr(label(text:"Food :") label(text:"0" handle: Food)
@@ -105,40 +81,34 @@ define
 	 wood := Wood
 	 stone := Stone
 	 foodImg := {QTk.newImage photo(file:CD#'/food.gif')}
+	 steelImg := {QTk.newImage photo(file:CD#'/steel.gif')}
+	 woodImg := {QTk.newImage photo(file:CD#'/wood.gif')}
+	 stoneImg := {QTk.newImage photo(file:CD#'/stone.gif')}
+	 homeImg := {QTk.newImage photo(file:CD#'/home.gif')}
 	 bg := {QTk.newImage photo(file:CD#'/white.gif')}
        % Envoyer message a l'environement pour demander information sur le jeu
-	 {ConfigureGui getfoodinfo(foodImg grid)}
-	 {ConfigureGui getsteelinfo(steelImg grid)}
-	 {ConfigureGui getstoneinfo(stoneImg grid)}
-	 {ConfigureGui getwoodinfo(woodImg grid)}
-      end
-
-      meth player(Team X Y) Img in
-	 if Team == 'a' then
-	    Img = @playera
-	 else
-	    Img = @playerb
+	 {Send GuiToEnviCommunication getconfiguration(StaticEnv)}
+       % Parcourir l'environnement et dessiner la carte.
+	 for I in 1..{Record.width StaticEnv.board}
+	    for J in 1..{Record.width StaticEnv.board.1}
+	       if StaticEnv.board.I.J == field then
+		  {@grid configure(label(image: @foodImg) row: I column: J)}
+	       elseif StaticEnv.board.I.J == forest then
+		  {@grid configure(label(image: @woodImg) row: I column: J)}
+	       elseif StaticEnv.board.I.J == quarry then
+		  {@grid configure(label(image: @stoneImg) row: I column: J)}
+	       elseif StaticEnv.board.I.J == mine then
+		  {@grid configure(label(image: @steelImg) row: I column: J)}
+	       elseif StaticEnv.board.I.J == home then
+		  {@grid configure(label(image: @homeImg) row: I column: J)}
+		  %dessiner ici mes villageois de depart.
+	       end
+	    end
 	 end
-	 {@grid configure(label(image:Img) row:X+X-1 column:Y+Y-1)}
       end
-      %meth disposeFood()
-	 
-      %end
-      %meth disposeWood()
-
-      %end
-      %meth disposeStone()
-
-      %end
-      %meth disposeSteel()
-
-      %end
       meth changeFood(X)
-	 S P T W in
+	 S in
 	 S = @food
-	 {S get(text:P)}
-	 T = {GetInt P 0}
-	 W = T+X
 	 if W < 0 then W in
 	    W = 0
 	    {S set(""#W)}
@@ -146,12 +116,9 @@ define
 	    {S set(""#W)}
 	 end
       end
-      meth changeStone(X)
-	 S P T W in
+      meth changeStone(W)
+	 S in
 	 S = @stone
-	 {S get(text:P)}
-	 T = {GetInt P 0}
-	 W = T+X
 	 if W < 0 then W in
 	    W = 0
 	    {S set(""#W)}
@@ -159,12 +126,9 @@ define
 	    {S set(""#W)}
 	 end
       end
-      meth changeSteel(X)
-	 S P T W in
+      meth changeSteel(W)
+	 S in
 	 S = @steel
-	 {S get(text:P)}
-	 T = {GetInt P 0}
-	 W = T+X
 	 if W < 0 then W in
 	    W = 0
 	    {S set(""#W)}
@@ -173,11 +137,8 @@ define
 	 end
       end
       meth changeWood(X)
-	 S P T W in
+	 S in
 	 S = @wood
-	 {S get(text:P)}
-	 T = {GetInt P 0}
-	 W = T+X
 	 if W < 0 then W in
 	    W = 0
 	    {S set(""#W)}
@@ -194,8 +155,8 @@ define
    {G changeStone(1)}
    {G changeSteel(10)}
    {Delay 1000}
-   {G changeSteel(~24)}
-   end
+   {G changeSteel(24)}
+end
 
 
 
